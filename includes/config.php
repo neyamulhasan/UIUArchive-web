@@ -26,10 +26,12 @@ define('ALLOWED_DOCUMENT_TYPES', ['pdf', 'doc', 'docx', 'ppt', 'pptx']);
 define('PROJECTS_PER_PAGE', 12);
 define('NOTIFICATIONS_PER_PAGE', 15);
 
-// Session Configuration
-ini_set('session.cookie_httponly', 1);
-ini_set('session.use_only_cookies', 1);
-ini_set('session.cookie_secure', 0); // Set to 1 if using HTTPS
+// Session Configuration (only set if session not already started)
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_only_cookies', 1);
+    ini_set('session.cookie_secure', 0); // Set to 1 if using HTTPS
+}
 
 // Timezone
 date_default_timezone_set('Asia/Dhaka');

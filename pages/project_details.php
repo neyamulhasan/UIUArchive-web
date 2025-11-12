@@ -57,7 +57,26 @@ if ($isLoggedIn) {
 
     <!-- Project Header -->
     <div class="p-6 mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 mb-4"><?php echo escape($project['title']); ?></h1>
+        <div class="flex items-start justify-between mb-4">
+            <h1 class="text-3xl font-bold text-gray-900"><?php echo escape($project['title']); ?></h1>
+            
+            <!-- Edit/Delete Buttons (only for project owner) -->
+            <?php if ($isLoggedIn && $_SESSION['user_id'] == $project['user_id']): ?>
+            <div class="flex gap-2">
+                <a href="edit_project.php?id=<?php echo $projectId; ?>" 
+                   class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-edit"></i>
+                    <span>Edit</span>
+                </a>
+                <button type="button" 
+                        onclick="confirmDelete(<?php echo $projectId; ?>)" 
+                        class="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    <i class="fas fa-trash"></i>
+                    <span>Delete</span>
+                </button>
+            </div>
+            <?php endif; ?>
+        </div>
         
         <!-- Author Info -->
         <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
@@ -267,3 +286,85 @@ if ($isLoggedIn) {
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
+
+<script>
+// Ensure Swal is loaded before defining the function
+if (typeof Swal === 'undefined') {
+    console.error('SweetAlert2 is not loaded!');
+}
+
+function confirmDelete(projectId) {
+    console.log('confirmDelete called with projectId:', projectId);
+    
+    if (typeof Swal === 'undefined') {
+        alert('Error: SweetAlert2 library not loaded. Please refresh the page.');
+        return;
+    }
+    
+    Swal.fire({
+        title: 'Delete This Project?',
+        html: `
+            <div class="text-left">
+                <p class="text-gray-700 mb-4">You are about to permanently delete this project.</p>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded">
+                    <p class="text-sm text-red-900 font-semibold mb-2">This will permanently delete:</p>
+                    <ul class="text-sm text-red-800 list-disc list-inside space-y-1">
+                        <li>All project information and details</li>
+                        <li>Project thumbnail and uploaded media</li>
+                        <li>All likes and engagement data</li>
+                        <li>All tags and associations</li>
+                    </ul>
+                </div>
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                    <p class="text-sm text-yellow-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        <strong>Warning:</strong> This action is permanent and cannot be undone!
+                    </p>
+                </div>
+            </div>
+        `,
+        icon: 'warning',
+        iconColor: '#dc2626',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="fas fa-trash mr-2"></i>Yes, Delete Project',
+        cancelButtonText: '<i class="fas fa-times mr-2"></i>Keep Project',
+        customClass: {
+            popup: 'rounded-lg',
+            title: 'text-2xl font-bold text-gray-900',
+            confirmButton: 'px-6 py-3 rounded-lg font-semibold',
+            cancelButton: 'px-6 py-3 rounded-lg font-semibold'
+        },
+        width: '600px',
+        backdrop: 'rgba(0,0,0,0.4)',
+        focusCancel: true
+    }).then((result) => {
+        console.log('Swal result:', result);
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Deleting Project...',
+                text: 'Please wait while we delete your project',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Redirect to delete handler
+            console.log('Redirecting to delete_project.php?id=' + projectId);
+            window.location.href = 'delete_project.php?id=' + projectId;
+        }
+    }).catch((error) => {
+        console.error('Swal error:', error);
+    });
+}
+
+// Log that script is loaded
+console.log('Delete confirmation script loaded');
+</script>
+

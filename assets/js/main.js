@@ -431,6 +431,8 @@ function initImagePreview() {
  * Show Toast Notification
  */
 function showToast(message, type = 'info') {
+    console.log('showToast called:', message, type);
+    
     const colors = {
         success: 'bg-green-500',
         error: 'bg-red-500',
@@ -447,17 +449,21 @@ function showToast(message, type = 'info') {
     
     const toast = document.createElement('div');
     toast.className = `toast ${colors[type]} text-white flex items-center space-x-3`;
+    toast.style.cssText = 'position: fixed; top: 80px; right: 20px; z-index: 99999; padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.2); min-width: 250px;';
     toast.innerHTML = `
         <i class="fas ${icons[type]}"></i>
         <span>${message}</span>
     `;
     
     document.body.appendChild(toast);
+    console.log('Toast appended to body');
     
     setTimeout(() => {
-        toast.style.animation = 'slideOut 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
         setTimeout(() => {
             toast.remove();
+            console.log('Toast removed');
         }, 300);
     }, 3000);
 }

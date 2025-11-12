@@ -59,6 +59,9 @@ if ($isLoggedIn && $currentPage !== 'setup_profile.php' && $currentPage !== 'log
         }
     </script>
     
+    <!-- SweetAlert2 for beautiful alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -185,6 +188,43 @@ if ($isLoggedIn && $currentPage !== 'setup_profile.php' && $currentPage !== 'log
             </form>
         </div>
     </nav>
+    
+    <!-- Flash Messages -->
+    <?php if (isset($_SESSION['success_message'])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: '<?php echo addslashes($_SESSION['success_message']); ?>',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+        <?php unset($_SESSION['success_message']); ?>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error_message'])): ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: '<?php echo addslashes($_SESSION['error_message']); ?>',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 4000,
+                    timerProgressBar: true
+                });
+            });
+        </script>
+        <?php unset($_SESSION['error_message']); ?>
+    <?php endif; ?>
     
     <!-- Main Content -->
     <main class="min-h-screen">
