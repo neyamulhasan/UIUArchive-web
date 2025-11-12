@@ -1,0 +1,97 @@
+<?php
+/**
+ * Google OAuth Configuration - TEMPLATE
+ * UIUArchive - Built by UIU Minds
+ * 
+ * INSTRUCTIONS:
+ * 1. Copy this file and rename it to: google_oauth.php
+ * 2. Replace YOUR_GOOGLE_CLIENT_ID_HERE and YOUR_GOOGLE_CLIENT_SECRET_HERE with your actual credentials
+ * 3. Get credentials from: https://console.cloud.google.com/
+ */
+
+// Google OAuth Settings
+define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID_HERE');
+define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET_HERE');
+define('GOOGLE_REDIRECT_URI', 'http://localhost/MadeInUIU-web/pages/google_callback.php');
+
+// OAuth Scopes - what information we request
+define('GOOGLE_SCOPES', 'email profile');
+
+// Google OAuth URLs
+define('GOOGLE_AUTH_URL', 'https://accounts.google.com/o/oauth2/v2/auth');
+define('GOOGLE_TOKEN_URL', 'https://oauth2.googleapis.com/token');
+define('GOOGLE_USER_INFO_URL', 'https://www.googleapis.com/oauth2/v2/userinfo');
+
+/**
+ * Generate Google OAuth Login URL
+ */
+function getGoogleLoginUrl() {
+    $params = [
+        'client_id' => GOOGLE_CLIENT_ID,
+        'redirect_uri' => GOOGLE_REDIRECT_URI,
+        'response_type' => 'code',
+        'scope' => GOOGLE_SCOPES,
+        'access_type' => 'offline',
+        'prompt' => 'consent'
+    ];
+    
+    return GOOGLE_AUTH_URL . '?' . http_build_query($params);
+}
+
+/**
+ * Exchange authorization code for access token
+ */
+function getGoogleAccessToken($code) {
+    $params = [
+        'client_id' => GOOGLE_CLIENT_ID,
+        'client_secret' => GOOGLE_CLIENT_SECRET,
+        'redirect_uri' => GOOGLE_REDIRECT_URI,
+        'grant_type' => 'authorization_code',
+        'code' => $code
+    ];
+    
+    $ch = curl_init(GOOGLE_TOKEN_URL);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode !== 200) {
+        return false;
+    }
+    
+    $data = json_decode($response, true);
+    return isset($data['access_token']) ? $data['access_token'] : false;
+}
+
+/**
+ * Get user information from Google
+ */
+function getGoogleUserInfo($accessToken) {
+    $ch = curl_init(GOOGLE_USER_INFO_URL);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $accessToken]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode !== 200) {
+        return false;
+    }
+    
+    return json_decode($response, true);
+}
+
+/**
+ * Check if email is UIU email (for Google login)
+ */
+function isUIUGoogleEmail($email) {
+    return preg_match('/@(student\.)?uiu\.ac\.bd$/i', $email);
+}
+?>

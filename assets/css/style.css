@@ -1,0 +1,79 @@
+/**
+ * Custom Styles for UIUArchive
+ * Built by UIU Minds
+ */
+
+/* Custom Color Variables - Muted Orange Theme */
+:root {
+    --uiu-orange-50: #fff7ed;
+    --uiu-orange-100: #ffedd5;
+    --uiu-orange-200: #fed7aa;
+    --uiu-orange-500: #d97706;  /* More muted, darker orange */
+    --uiu-orange-600: #c2410c;  /* Even darker, professional */
+    --uiu-orange-700: #9a3412;  /* Very dark orange */
+}
+
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Smooth Transitions */
+a, button, .transition {
+    transition: all 0.3s ease;
+}
+
+/* Details/Summary Dropdown */
+details[open] summary .fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+details summary::-webkit-details-marker {
+    display: none;
+}

@@ -1,0 +1,65 @@
+# UIUArchive - Built by UIU Minds
+# Git Ignore File
+
+# Uploaded Files
+uploads/*
+!uploads/.gitkeep
+!uploads/profiles/.gitkeep
+!uploads/projects/.gitkeep
+
+# Database Configuration (if contains sensitive data)
+# includes/db.php
+
+# Google OAuth Credentials (NEVER commit these!)
+includes/google_oauth.php
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# PHP
+*.log
+error_log
+debug.log
+
+# Temporary Files
+tmp/
+temp/
+cache/
+
+# Environment Files
+.env
+.env.local
+
+# Composer (if used in future)
+vendor/
+composer.lock
+
+# NPM/Node (if used in future)
+node_modules/
+package-lock.json
+
+# OS Files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Backup Files
+*.bak
+*.backup
+*.sql.gz
+*.zip
+*.tar.gz
+
+# Session Files
+sessions/
+*.sess
+
+# PHP Cache
+.phpunit.cache/
+.php_cs.cache
+.php-cs-fixer.cache
