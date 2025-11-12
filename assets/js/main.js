@@ -131,52 +131,111 @@ function initRecommendButtons() {
  */
 function initLikeButtons() {
     const likeButtons = document.querySelectorAll('.like-btn');
+    console.log('Like buttons found:', likeButtons.length);
     
     likeButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('Like button clicked!');
             
-            const projectId = this.dataset.projectId;
-            const icon = this.querySelector('i');
-            const countSpan = this.querySelector('.like-count');
+            // Store reference to button
+            const btn = this;
+            const projectId = btn.dataset.projectId;
+            const icon = btn.querySelector('i');
+            const countSpan = btn.querySelector('.like-count');
+            
+            console.log('Project ID:', projectId);
+            
+            // Prevent multiple clicks
+            if (btn.disabled) {
+                console.log('Button already processing...');
+                return;
+            }
+            
+            // Disable button temporarily
+            btn.disabled = true;
             
             // Send AJAX request
+            console.log('Sending request to:', '../ajax/like_project.php');
+            console.log('Project ID:', projectId);
+            
             fetch('../ajax/like_project.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({ project_id: projectId })
+                body: 'project_id=' + projectId
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Raw response:', text);
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    console.error('JSON parse error:', e);
+                    console.error('Response was:', text);
+                    throw new Error('Invalid JSON response');
+                }
+                return data;
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.success) {
-                    // Toggle like state
-                    if (data.liked) {
-                        icon.classList.remove('far');
-                        icon.classList.add('fas');
-                        this.classList.add('liked');
-                    } else {
-                        icon.classList.remove('fas');
-                        icon.classList.add('far');
-                        this.classList.remove('liked');
-                    }
+                    console.log('Liked status:', data.liked);
+                    console.log('New count:', data.likes_count);
                     
-                    // Update count
+                    // Update count first
                     countSpan.textContent = data.likes_count;
                     
+                    // Toggle like state and update styling
+                    if (data.liked) {
+                        // Liked state
+                        console.log('Setting to LIKED state');
+                        icon.className = 'fas fa-heart';
+                        btn.className = 'like-btn flex items-center gap-2 px-4 py-2 rounded-lg transition-colors bg-red-100 text-red-600 hover:bg-red-200';
+                    } else {
+                        // Unliked state
+                        console.log('Setting to UNLIKED state');
+                        icon.className = 'far fa-heart';
+                        btn.className = 'like-btn flex items-center gap-2 px-4 py-2 rounded-lg transition-colors bg-gray-100 text-gray-600 hover:bg-gray-200';
+                    }
+                    
+                    // Update stats section if present
+                    const statsLikesCount = document.querySelector('.stats-likes-count');
+                    if (statsLikesCount) {
+                        statsLikesCount.textContent = data.likes_count;
+                        console.log('Updated stats count');
+                    }
+                    
                     // Animation
-                    this.classList.add('animate-pulse');
+                    icon.style.animation = 'none';
                     setTimeout(() => {
-                        this.classList.remove('animate-pulse');
-                    }, 500);
+                        icon.style.animation = '';
+                    }, 10);
+                    
+                    console.log('Showing toast...');
+                    showToast(data.message, 'success');
                 } else {
+                    console.log('Error:', data.message);
                     showToast(data.message || 'Please login to like projects', 'error');
                 }
+                
+                // Re-enable button
+                btn.disabled = false;
+                console.log('Button re-enabled');
             })
             .catch(error => {
-                console.error('Error:', error);
-                showToast('An error occurred', 'error');
+                console.error('Fetch error:', error);
+                console.error('Error details:', error.message);
+                showToast('An error occurred: ' + error.message, 'error');
+                
+                // Re-enable button on error
+                btn.disabled = false;
             });
         });
     });

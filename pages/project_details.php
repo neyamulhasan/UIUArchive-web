@@ -83,13 +83,18 @@ if ($isLoggedIn) {
                 <i class="<?php echo $hasLiked ? 'fas' : 'far'; ?> fa-heart"></i>
                 <span class="like-count"><?php echo $project['likes_count']; ?></span>
             </button>
+            <?php else: ?>
+            <a href="login.php" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">
+                <i class="far fa-heart"></i>
+                <span><?php echo $project['likes_count']; ?></span>
+            </a>
             <?php endif; ?>
         </div>
 
         <!-- Project Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-200 rounded-lg">
             <div class="text-center">
-                <div class="text-2xl font-bold text-orange-600"><?php echo $project['likes_count']; ?></div>
+                <div class="text-2xl font-bold text-orange-600 stats-likes-count"><?php echo $project['likes_count']; ?></div>
                 <div class="text-sm text-gray-500">Likes</div>
             </div>
             <div class="text-center">

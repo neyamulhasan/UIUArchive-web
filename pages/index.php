@@ -187,14 +187,28 @@ $totalPages = ceil($totalProjects / $perPage);
                                 </p>
                                 
                                 <!-- Meta Info -->
-                                <div class="flex items-center flex-wrap gap-2 text-sm text-gray-500">
-                                    <span class="text-gray-500 font-normal">in</span>
-                                    <a href="profile.php?id=<?php echo $project['user_id']; ?>" 
-                                       class="text-gray-600 hover:text-orange-600 font-normal">
-                                        <?php echo escape($project['full_name']); ?>
-                                    </a>
-                                    <span class="text-gray-400">•</span>
-                                    <span class="text-gray-500"><?php echo escape($project['category']); ?></span>
+                                <div class="flex items-center justify-between flex-wrap gap-2 text-sm">
+                                    <div class="flex items-center gap-2 text-gray-500">
+                                        <span class="text-gray-500 font-normal">in</span>
+                                        <a href="profile.php?id=<?php echo $project['user_id']; ?>" 
+                                           class="text-gray-600 hover:text-orange-600 font-normal">
+                                            <?php echo escape($project['full_name']); ?>
+                                        </a>
+                                        <span class="text-gray-400">•</span>
+                                        <span class="text-gray-500"><?php echo escape($project['category']); ?></span>
+                                    </div>
+                                    
+                                    <!-- Stats -->
+                                    <div class="flex items-center gap-4 text-gray-500">
+                                        <span class="flex items-center gap-1">
+                                            <i class="fas fa-heart text-red-500"></i>
+                                            <span><?php echo number_format($project['likes_count']); ?></span>
+                                        </span>
+                                        <span class="flex items-center gap-1">
+                                            <i class="fas fa-eye text-blue-500"></i>
+                                            <span><?php echo number_format($project['views_count']); ?></span>
+                                        </span>
+                                    </div>
                                 </div>
                                 
                                 <!-- Tags -->

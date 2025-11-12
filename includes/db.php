@@ -10,8 +10,10 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'uiuarchive');
 
-// Base URL Configuration
-define('BASE_URL', '/UIUArchive-web');
+// Base URL Configuration (only define if not already defined)
+if (!defined('BASE_URL')) {
+    define('BASE_URL', '/UIUArchive-web');
+}
 
 // Create connection
 $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);

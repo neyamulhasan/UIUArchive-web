@@ -228,3 +228,59 @@ img {
     background-color: #f9fafb;
     font-weight: 600;
 }
+
+/* Toast Notification Styles */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+    min-width: 250px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Toast on mobile */
+@media (max-width: 640px) {
+    .toast {
+        right: 1rem;
+        left: 1rem;
+        bottom: 1rem;
+        min-width: auto;
+    }
+}
+
+/* Like button - keep cursor pointer even when processing */
+.like-btn {
+    cursor: pointer;
+}
+
+.like-btn:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
