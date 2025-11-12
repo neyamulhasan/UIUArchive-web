@@ -28,12 +28,6 @@ if ($isLoggedIn && $currentPage !== 'setup_profile.php' && $currentPage !== 'log
         exit();
     }
 }
-
-// Get unread notifications count
-$notificationCount = 0;
-if ($isLoggedIn) {
-    $notificationCount = getUnreadNotificationCount($conn, $currentUserId);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -112,16 +106,6 @@ if ($isLoggedIn) {
                         <a href="upload_project.php" class="hidden sm:flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold">
                             <i class="fas fa-plus mr-2"></i>
                             <span>Upload</span>
-                        </a>
-                        
-                        <!-- Notifications -->
-                        <a href="notifications.php" class="relative p-2 text-gray-300 hover:text-orange-600 transition">
-                            <i class="fas fa-bell text-xl"></i>
-                            <?php if ($notificationCount > 0): ?>
-                                <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    <?php echo $notificationCount > 9 ? '9+' : $notificationCount; ?>
-                                </span>
-                            <?php endif; ?>
                         </a>
                         
                         <!-- Profile Dropdown -->

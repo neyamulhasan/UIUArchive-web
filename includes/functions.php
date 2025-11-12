@@ -162,27 +162,6 @@ function uploadFile($file, $targetDir, $allowedTypes = ['jpg', 'jpeg', 'png', 'g
 }
 
 /**
- * Send notification to user
- */
-function sendNotification($conn, $userId, $type, $message, $relatedId = null) {
-    $stmt = mysqli_prepare($conn, "INSERT INTO notifications (user_id, type, message, related_id) VALUES (?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, "issi", $userId, $type, $message, $relatedId);
-    return mysqli_stmt_execute($stmt);
-}
-
-/**
- * Get unread notification count
- */
-function getUnreadNotificationCount($conn, $userId) {
-    $stmt = mysqli_prepare($conn, "SELECT COUNT(*) as count FROM notifications WHERE user_id = ? AND is_read = 0");
-    mysqli_stmt_bind_param($stmt, "i", $userId);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $row = mysqli_fetch_assoc($result);
-    return $row['count'];
-}
-
-/**
  * Check if user has liked a project
  */
 function hasUserLikedProject($conn, $userId, $projectId) {

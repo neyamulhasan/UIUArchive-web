@@ -183,52 +183,6 @@ function initLikeButtons() {
 }
 
 /**
- * Follow Button Functionality (AJAX)
- */
-function initFollowButtons() {
-    const followButtons = document.querySelectorAll('.follow-btn');
-    
-    followButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const projectId = this.dataset.projectId;
-            
-            fetch('../ajax/follow_project.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ project_id: projectId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Toggle follow state
-                    if (data.following) {
-                        this.innerHTML = '<i class="fas fa-check mr-2"></i>Following';
-                        this.classList.remove('bg-blue-600');
-                        this.classList.add('bg-gray-600');
-                    } else {
-                        this.innerHTML = '<i class="fas fa-plus mr-2"></i>Follow';
-                        this.classList.remove('bg-gray-600');
-                        this.classList.add('bg-blue-600');
-                    }
-                    
-                    showToast(data.message, 'success');
-                } else {
-                    showToast(data.message || 'Please login to follow projects', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('An error occurred', 'error');
-            });
-        });
-    });
-}
-
-/**
  * Comment Form Functionality (AJAX)
  */
 function initCommentForms() {

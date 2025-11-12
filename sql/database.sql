@@ -94,49 +94,6 @@ CREATE TABLE likes (
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Follows table (users following projects)
-CREATE TABLE follows (
-    follow_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    project_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_follow (user_id, project_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_project_id (project_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Events table (hackathons, competitions, workshops)
-CREATE TABLE events (
-    event_id INT AUTO_INCREMENT PRIMARY KEY,
-    event_name VARCHAR(200) NOT NULL,
-    event_description TEXT,
-    event_type ENUM('hackathon', 'workshop', 'competition', 'expo', 'other') NOT NULL,
-    event_date DATE NOT NULL,
-    event_time TIME,
-    location VARCHAR(255),
-    organizer_id INT,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (organizer_id) REFERENCES users(user_id) ON DELETE SET NULL,
-    INDEX idx_event_date (event_date)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Notifications table
-CREATE TABLE notifications (
-    notification_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    type ENUM('like', 'follow') NOT NULL,
-    message TEXT NOT NULL,
-    related_id INT,
-    is_read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    INDEX idx_user_id (user_id),
-    INDEX idx_is_read (is_read)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Insert sample categories (as tags)
 INSERT INTO tags (tag_name) VALUES
 ('WebApp'), ('MobileApp'), ('AI'), ('MachineLearning'),
