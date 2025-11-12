@@ -11,12 +11,6 @@ require_once '../includes/db.php';
 // Set JSON header
 header('Content-Type: application/json');
 
-// Debug logging
-error_log("=== LIKE PROJECT DEBUG ===");
-error_log("REQUEST_METHOD: " . $_SERVER['REQUEST_METHOD']);
-error_log("POST data: " . print_r($_POST, true));
-error_log("Session user_id: " . (isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NOT SET'));
-
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     error_log("ERROR: User not logged in");
@@ -125,8 +119,6 @@ try {
         'message' => 'An error occurred: ' . $e->getMessage()
     ]);
 }
-
-error_log("=== END LIKE PROJECT DEBUG ===");
 
 mysqli_close($conn);
 ?>

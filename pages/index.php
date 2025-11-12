@@ -201,11 +201,11 @@ $totalPages = ceil($totalProjects / $perPage);
                                     <!-- Stats -->
                                     <div class="flex items-center gap-4 text-gray-500">
                                         <span class="flex items-center gap-1">
-                                            <i class="fas fa-heart text-red-500"></i>
+                                            <i class="fas fa-heart text-gray-500"></i>
                                             <span><?php echo number_format($project['likes_count']); ?></span>
                                         </span>
                                         <span class="flex items-center gap-1">
-                                            <i class="fas fa-eye text-blue-500"></i>
+                                            <i class="fas fa-eye text-gray-500"></i>
                                             <span><?php echo number_format($project['views_count']); ?></span>
                                         </span>
                                     </div>
@@ -281,15 +281,15 @@ $totalPages = ceil($totalProjects / $perPage);
                     <div class="space-y-1">
                         <a href="index.php?filter=latest" 
                            class="block text-sm text-gray-700 hover:text-orange-600 py-1 <?php echo $filter === 'latest' ? 'font-semibold' : ''; ?>">
-                            <i class="fas fa-clock w-4"></i> Latest
+                            <i class="fas fa-arrow-up w-4"></i> Latest
                         </a>
                         <a href="index.php?filter=popular" 
                            class="block text-sm text-gray-700 hover:text-orange-600 py-1 <?php echo $filter === 'popular' ? 'font-semibold' : ''; ?>">
-                            <i class="fas fa-heart w-4"></i> Popular
+                            <i class="fas fa-fire w-4"></i> Popular
                         </a>
                         <a href="index.php?filter=oldest" 
                            class="block text-sm text-gray-700 hover:text-orange-600 py-1 <?php echo $filter === 'oldest' ? 'font-semibold' : ''; ?>">
-                            <i class="fas fa-history w-4"></i> Oldest
+                            <i class="fas fa-arrow-down w-4"></i> Oldest
                         </a>
                     </div>
                 </div>
