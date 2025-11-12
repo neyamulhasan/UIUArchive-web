@@ -1,26 +1,130 @@
 /**
- * Main JavaScript for MadeInUIU
- * Built by UIU Minds
- */
-
-// Initialize when DOM is ready
-/**
  * Main JavaScript for UIUArchive
+ * Lightweight version - Built by UIU Minds
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components here
-    
     console.log('UIUArchive - Built by UIU Minds');
+    console.log('Initializing components...');
     
-    // Initialize all components
+    // Only initialize essential components
     initLikeButtons();
-    initFollowButtons();
     initCommentForms();
-    initFileUpload();
-    initImagePreview();
-    initTooltips();
+    initRecommendButtons();
+    
+    console.log('Recommend buttons found:', document.querySelectorAll('.recommend-btn').length);
 });
+
+/**
+ * Prevent Image Blinking - Smooth Image Loading
+ */
+function initImageLoading() {
+    // Select all images except small profile images in cards
+    const images = document.querySelectorAll('img:not(.rounded-full)');
+    
+    images.forEach(img => {
+        // Skip if it's a profile image
+        if (img.classList.contains('w-8') && img.classList.contains('h-8')) {
+            img.style.opacity = '1';
+            return;
+        }
+        
+        // If image is already loaded (cached)
+        if (img.complete) {
+            img.style.opacity = '1';
+        } else {
+            // Set initial opacity to 0
+            img.style.opacity = '0';
+            
+            // When image loads, fade it in
+            img.addEventListener('load', function() {
+                this.style.transition = 'opacity 0.2s ease-in';
+                this.style.opacity = '1';
+            });
+            
+            // Handle error
+            img.addEventListener('error', function() {
+                this.style.opacity = '1';
+            });
+        }
+    });
+    
+    // Profile images - always visible, no transition
+    const profileImages = document.querySelectorAll('img.rounded-full');
+    profileImages.forEach(img => {
+        img.style.opacity = '1';
+    });
+}
+
+/**
+ * Recommend User Button Functionality (AJAX) - Toggle recommend/unrecommend
+ */
+function initRecommendButtons() {
+    const recommendButtons = document.querySelectorAll('.recommend-btn');
+    
+    recommendButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const userId = this.dataset.userId;
+            const buttonText = this.querySelector('span');
+            const icon = this.querySelector('i');
+            const isRecommended = this.dataset.recommended === '1';
+            
+            // Send AJAX request
+            fetch('recommend_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'user_id=' + userId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Toggle button state
+                    if (data.recommended) {
+                        // Changed to recommended
+                        this.classList.remove('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                        this.classList.add('bg-yellow-100', 'text-yellow-700', 'hover:bg-yellow-200');
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        buttonText.textContent = 'Recommended';
+                        this.dataset.recommended = '1';
+                    } else {
+                        // Changed to not recommended
+                        this.classList.remove('bg-yellow-100', 'text-yellow-700', 'hover:bg-yellow-200');
+                        this.classList.add('bg-gray-100', 'text-gray-600', 'hover:bg-gray-200');
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        buttonText.textContent = 'Recommend';
+                        this.dataset.recommended = '0';
+                    }
+                    
+                    // Update recommendation count in the stats
+                    const recCountElement = document.querySelector('.recommendations-count');
+                    if (recCountElement) {
+                        recCountElement.textContent = data.new_count;
+                    }
+                    
+                    // Animation
+                    icon.classList.add('animate-pulse');
+                    setTimeout(() => {
+                        icon.classList.remove('animate-pulse');
+                    }, 500);
+                    
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message || 'Failed to update recommendation', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred', 'error');
+            });
+        });
+    });
+}
 
 /**
  * Like Button Functionality (AJAX)

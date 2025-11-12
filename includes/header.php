@@ -40,6 +40,7 @@ if ($isLoggedIn) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer-when-downgrade">
     <title><?php echo isset($pageTitle) ? $pageTitle . ' - ' : ''; ?>UIUArchive</title>
     <meta name="description" content="UIUArchive - A platform for UIU students to showcase their projects">
     
@@ -68,7 +69,7 @@ if ($isLoggedIn) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Alpine.js for interactive components -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../assets/css/style.css">
@@ -124,24 +125,31 @@ if ($isLoggedIn) {
                         </a>
                         
                         <!-- Profile Dropdown -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                        <div class="relative">
+                            <button onclick="toggleDropdown()" class="flex items-center space-x-2 focus:outline-none">
                                 <?php 
-                                    $profileImg = $_SESSION['profile_image'] ?? 'default.jpg';
-                                    // Check if it's a URL (Google profile picture) or local file
-                                    $imgSrc = (strpos($profileImg, 'http') === 0) ? $profileImg : BASE_URL . '/uploads/profiles/' . $profileImg;
+                                    // Use session profile image directly
+                                    $profileImage = $_SESSION['profile_image'] ?? null;
+                                    $fullName = $_SESSION['full_name'] ?? 'User';
+                                    
+                                    // If profile image is a Google URL, use it directly and resize
+                                    if (!empty($profileImage) && (strpos($profileImage, 'http://') === 0 || strpos($profileImage, 'https://') === 0)) {
+                                        // Replace Google image size parameter (26px for header)
+                                        $imgSrc = preg_replace('/=s\d+-c$/', '=s26-c', $profileImage);
+                                    } else {
+                                        // Generate initials avatar
+                                        $imgSrc = getProfileImageUrl($profileImage, $fullName);
+                                    }
                                 ?>
-                                <img src="<?php echo $imgSrc; ?>" 
+                                <img src="<?php echo htmlspecialchars($imgSrc); ?>" 
                                      alt="Profile" 
+                                     referrerpolicy="no-referrer"
                                      class="h-8 w-8 rounded-full object-cover border-2 border-orange-600"
-                                     onerror="this.src='<?php echo BASE_URL; ?>/uploads/profiles/default.jpg'">
+                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($fullName); ?>&background=c2410c&color=fff&size=32';">
                                 <i class="fas fa-chevron-down text-gray-300"></i>
                             </button>
                             
-                            <div x-show="open" 
-                                 @click.away="open = false"
-                                 class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50"
-                                 style="display: none;">
+                            <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
                                 <a href="profile.php" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                                     <i class="fas fa-user mr-2"></i>My Profile
                                 </a>
@@ -154,6 +162,19 @@ if ($isLoggedIn) {
                                 </a>
                             </div>
                         </div>
+                        <script>
+                        function toggleDropdown() {
+                            document.getElementById('profileDropdown').classList.toggle('hidden');
+                        }
+                        // Close dropdown when clicking outside
+                        document.addEventListener('click', function(event) {
+                            const dropdown = document.getElementById('profileDropdown');
+                            const button = event.target.closest('button');
+                            if (dropdown && !dropdown.contains(event.target) && !button) {
+                                dropdown.classList.add('hidden');
+                            }
+                        });
+                        </script>
                     <?php else: ?>
                         <!-- Google Sign-In -->
                         <a href="login.php" class="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition inline-flex items-center font-semibold">
@@ -180,9 +201,6 @@ if ($isLoggedIn) {
             </form>
         </div>
     </nav>
-    
-    <!-- Alpine.js for dropdown -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Main Content -->
     <main class="min-h-screen">

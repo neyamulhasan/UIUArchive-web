@@ -24,6 +24,38 @@ function getCurrentUserId() {
 }
 
 /**
+ * Get profile image URL - handles NULL, Google URLs, and generates initials avatar
+ */
+function getProfileImageUrl($profileImage, $fullName) {
+    // If it's a Google URL or external URL, return it directly
+    if (!empty($profileImage) && strpos($profileImage, 'http') === 0) {
+        return $profileImage;
+    }
+    
+    // If NULL or empty, generate initials avatar using UI Avatars API
+    // Extract first letters of first and last name
+    $nameParts = explode(' ', trim($fullName));
+    $initials = '';
+    
+    if (count($nameParts) >= 2) {
+        // First name initial + Last name initial
+        $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[count($nameParts) - 1], 0, 1));
+    } else {
+        // Just first 2 letters of single name
+        $initials = strtoupper(substr($nameParts[0], 0, 2));
+    }
+    
+    // Generate avatar URL with orange theme colors
+    $colors = ['c2410c', 'd97706', '9a3412', 'ea580c', 'f97316'];
+    $randomColor = $colors[array_rand($colors)];
+    
+    // Use smaller size (48px) for better performance and proper display
+    return 'https://ui-avatars.com/api/?name=' . urlencode($initials) . 
+           '&background=' . $randomColor . 
+           '&color=fff&size=48&font-size=0.5&bold=true';
+}
+
+/**
  * Redirect to another page
  */
 function redirect($url) {
@@ -260,5 +292,84 @@ function isValidUIUEmail($email) {
  */
 function generatePortfolioLink($userId) {
     return "profile.php?id=" . $userId;
+}
+
+/**
+ * Simple Markdown parser for basic markdown formatting
+ */
+function parseMarkdown($text) {
+    if (empty($text)) {
+        return '';
+    }
+    
+    // First, store and process images and links to avoid HTML escaping issues
+    $htmlTags = array();
+    $counter = 0;
+    
+    // Process images ![alt text](url "title") - must be before links
+    $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\s)]+)(?:\s+"([^"]*)")?\)/', function($matches) use (&$htmlTags, &$counter) {
+        $alt = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
+        $src = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
+        $title = isset($matches[3]) && !empty($matches[3]) ? htmlspecialchars($matches[3], ENT_QUOTES, 'UTF-8') : '';
+        $imgTag = '<img src="' . $src . '" alt="' . $alt . '" title="' . $title . '" class="max-w-full h-auto rounded-lg my-4 shadow-sm" loading="lazy">';
+        $placeholder = "HTMLTAG_" . $counter . "_HTMLTAG";
+        $htmlTags[$placeholder] = $imgTag;
+        $counter++;
+        return $placeholder;
+    }, $text);
+    
+    // Process links (must be after images to avoid conflicts)
+    $text = preg_replace_callback('/\[(.+?)\]\((.+?)\)/', function($matches) use (&$htmlTags, &$counter) {
+        $linkText = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
+        $url = htmlspecialchars($matches[2], ENT_QUOTES, 'UTF-8');
+        $linkTag = '<a href="' . $url . '" class="text-blue-600 hover:text-blue-800 underline" target="_blank">' . $linkText . '</a>';
+        $placeholder = "HTMLTAG_" . $counter . "_HTMLTAG";
+        $htmlTags[$placeholder] = $linkTag;
+        $counter++;
+        return $placeholder;
+    }, $text);
+    
+    // Now escape HTML to prevent XSS
+    $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+    
+    // Headers
+    $text = preg_replace('/^### (.+)$/m', '<h3 class="text-lg font-semibold text-gray-900 mt-4 mb-2">$1</h3>', $text);
+    $text = preg_replace('/^## (.+)$/m', '<h2 class="text-xl font-semibold text-gray-900 mt-6 mb-3">$1</h2>', $text);
+    $text = preg_replace('/^# (.+)$/m', '<h1 class="text-2xl font-bold text-gray-900 mt-8 mb-4">$1</h1>', $text);
+    
+    // Bold and italic
+    $text = preg_replace('/\*\*(.+?)\*\*/', '<strong class="font-semibold">$1</strong>', $text);
+    $text = preg_replace('/\*(.+?)\*/', '<em class="italic">$1</em>', $text);
+    
+    // Code blocks
+    $text = preg_replace('/```(.+?)```/s', '<pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto my-3"><code>$1</code></pre>', $text);
+    
+    // Inline code
+    $text = preg_replace('/`(.+?)`/', '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>', $text);
+    
+    // Lists
+    $text = preg_replace('/^\* (.+)$/m', '<li class="ml-4">• $1</li>', $text);
+    $text = preg_replace('/^\- (.+)$/m', '<li class="ml-4">• $1</li>', $text);
+    $text = preg_replace('/^(\d+)\. (.+)$/m', '<li class="ml-4">$1. $2</li>', $text);
+    
+    // Wrap lists in ul tags
+    $text = preg_replace('/(<li[^>]*>.*<\/li>)/s', '<ul class="space-y-1 my-3">$1</ul>', $text);
+    
+    // Line breaks and paragraphs
+    $text = preg_replace('/\n\n/', '</p><p class="mb-3">', $text);
+    $text = preg_replace('/\n/', '<br>', $text);
+    
+    // Wrap in paragraph tags
+    $text = '<p class="mb-3">' . $text . '</p>';
+    
+    // Clean up empty paragraphs
+    $text = preg_replace('/<p class="mb-3"><\/p>/', '', $text);
+    
+    // Restore HTML tags (images and links)
+    foreach ($htmlTags as $placeholder => $htmlTag) {
+        $text = str_replace($placeholder, $htmlTag, $text);
+    }
+    
+    return $text;
 }
 ?>

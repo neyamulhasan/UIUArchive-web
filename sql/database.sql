@@ -16,7 +16,7 @@ CREATE TABLE users (
     department VARCHAR(50),
     semester VARCHAR(20),
     bio TEXT,
-    profile_image VARCHAR(255) DEFAULT 'default.jpg',
+    profile_image VARCHAR(255) DEFAULT NULL,
     theme_color VARCHAR(20) DEFAULT '#3B82F6',
     is_verified BOOLEAN DEFAULT FALSE,
     role ENUM('student', 'faculty') DEFAULT 'student',
@@ -32,7 +32,7 @@ CREATE TABLE projects (
     user_id INT NOT NULL,
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
-    abstract TEXT,
+    project_blueprint TEXT,
     category VARCHAR(50) NOT NULL,
     department VARCHAR(50),
     semester VARCHAR(20),
@@ -40,16 +40,11 @@ CREATE TABLE projects (
     demo_link VARCHAR(255),
     thumbnail VARCHAR(255),
     visibility ENUM('public', 'private') DEFAULT 'public',
-    is_featured BOOLEAN DEFAULT FALSE,
-    is_endorsed BOOLEAN DEFAULT FALSE,
-    endorsed_by INT,
     views_count INT DEFAULT 0,
     likes_count INT DEFAULT 0,
-    comments_count INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (endorsed_by) REFERENCES users(user_id) ON DELETE SET NULL,
     INDEX idx_category (category),
     INDEX idx_user_id (user_id),
     INDEX idx_visibility (visibility),
@@ -99,20 +94,6 @@ CREATE TABLE likes (
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Comments table
-CREATE TABLE comments (
-    comment_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    project_id INT NOT NULL,
-    comment_text TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
-    INDEX idx_project_id (project_id),
-    INDEX idx_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Follows table (users following projects)
 CREATE TABLE follows (
     follow_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -124,26 +105,6 @@ CREATE TABLE follows (
     FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
     INDEX idx_user_id (user_id),
     INDEX idx_project_id (project_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Badges table
-CREATE TABLE badges (
-    badge_id INT AUTO_INCREMENT PRIMARY KEY,
-    badge_name VARCHAR(50) NOT NULL,
-    badge_description TEXT,
-    badge_icon VARCHAR(255),
-    criteria TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- User badges junction table
-CREATE TABLE user_badges (
-    user_id INT NOT NULL,
-    badge_id INT NOT NULL,
-    earned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, badge_id),
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (badge_id) REFERENCES badges(badge_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Events table (hackathons, competitions, workshops)
@@ -166,7 +127,7 @@ CREATE TABLE events (
 CREATE TABLE notifications (
     notification_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    type ENUM('like', 'comment', 'follow', 'featured', 'endorsed', 'badge') NOT NULL,
+    type ENUM('like', 'follow') NOT NULL,
     message TEXT NOT NULL,
     related_id INT,
     is_read BOOLEAN DEFAULT FALSE,
@@ -175,17 +136,6 @@ CREATE TABLE notifications (
     INDEX idx_user_id (user_id),
     INDEX idx_is_read (is_read)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Insert sample badges
-INSERT INTO badges (badge_name, badge_description, badge_icon, criteria) VALUES
-('First Project', 'Uploaded your first project', '🎯', 'Upload 1 project'),
-('Rising Star', 'Received 10 likes on a single project', '⭐', 'Get 10 likes on one project'),
-('Popular Creator', 'Received 50+ likes across all projects', '🌟', 'Get 50 total likes'),
-('Prolific', 'Uploaded 5 projects', '🚀', 'Upload 5 projects'),
-('Community Champion', 'Commented on 20 projects', '💬', 'Comment on 20 projects'),
-('Faculty Favorite', 'Received faculty endorsement', '👨‍🏫', 'Get endorsed by faculty'),
-('Trending Master', 'Had a featured project', '🔥', 'Get a project featured'),
-('Early Adopter', 'One of the first 100 users', '🎖️', 'Register early');
 
 -- Insert sample categories (as tags)
 INSERT INTO tags (tag_name) VALUES

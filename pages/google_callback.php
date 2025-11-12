@@ -10,6 +10,12 @@ require_once '../includes/google_oauth.php';
 
 session_start();
 
+// Check if user denied authorization
+if (isset($_GET['error'])) {
+    $_SESSION['error'] = 'Google login was cancelled or denied.';
+    redirect('login.php');
+}
+
 // Check if we have an authorization code
 if (!isset($_GET['code'])) {
     $_SESSION['error'] = 'Google login failed. Authorization code not received.';
@@ -104,15 +110,6 @@ if ($user = mysqli_fetch_assoc($result)) {
     
     if (mysqli_stmt_execute($stmt)) {
         $userId = mysqli_insert_id($conn);
-        
-        // Award "Early Adopter" badge if user is among first 100
-        $userCount = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM users"))['count'];
-        if ($userCount <= 100) {
-            awardBadge($conn, $userId, 8); // Early Adopter badge
-        }
-        
-        // Award "First Project" preparation
-        awardBadge($conn, $userId, 1);
         
         // Log them in
         $_SESSION['user_id'] = $userId;

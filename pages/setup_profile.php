@@ -1,7 +1,7 @@
 <?php
 /**
- * Profile Setup Page
- * MadeInUIU - Built by UIU Minds
+ * Profile Setup Page - First Time Only
+ * UIUArchive - Built by UIU Minds
  */
 
 require_once '../includes/db.php';
@@ -23,12 +23,19 @@ mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $user = mysqli_fetch_assoc($result);
 
-// If department is already set, redirect to home
+// If department is already set, redirect to edit profile
 if (!empty($user['department'])) {
-    redirect('index.php');
+    redirect('edit_profile.php');
 }
 
 $errors = [];
+
+// Get current user data
+$stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE user_id = ?");
+mysqli_stmt_bind_param($stmt, "i", $userId);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$currentUser = mysqli_fetch_assoc($result);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $batchNumber = sanitizeInput($_POST['batch_number']);
@@ -57,14 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get current user data
-$stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE user_id = ?");
-mysqli_stmt_bind_param($stmt, "i", $userId);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-$currentUser = mysqli_fetch_assoc($result);
-
-$pageTitle = 'Setup Your Profile';
+$pageTitle = 'Complete Your Profile';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,15 +72,33 @@ $pageTitle = 'Setup Your Profile';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle; ?> - UIUArchive</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        orange: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            500: '#d97706',
+                            600: '#c2410c',
+                            700: '#9a3412',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full">
         <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-5xl font-bold text-white mb-3">Welcome! 🎉</h1>
-            <p class="text-white text-xl opacity-90">Just 2 quick things to get started...</p>
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-bold text-orange-600 mb-3">Complete Your Profile</h1>
+            <p class="text-white text-xl opacity-90">Help us personalize your experience</p>
         </div>
         
         <!-- Setup Form -->
@@ -143,25 +161,26 @@ $pageTitle = 'Setup Your Profile';
                 
                 <!-- Submit Button -->
                 <div class="pt-4">
-                    <button type="submit" 
                     <button type="submit" class="w-full px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-all duration-300 font-medium text-lg shadow-md hover:shadow-lg">
-                        Continue to UIUArchive 🚀
+                        Continue to UIUArchive
                     </button>
                 </div>
             </form>
             
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-500">
-                    <i class="fas fa-shield-alt mr-1"></i>
-                    You can update this anytime from your profile settings
-                </p>
+            <div class="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-orange-600 mt-1 mr-3"></i>
+                    <p class="text-sm text-gray-700">
+                        You can update this information anytime from your profile settings
+                    </p>
+                </div>
             </div>
         </div>
         
         <!-- Logout Option -->
         <div class="text-center mt-6">
-            <a href="logout.php" class="text-white hover:underline text-sm">
-                <i class="fas fa-sign-out-alt mr-1"></i>Logout
+            <a href="logout.php" class="text-white hover:text-orange-500 transition inline-flex items-center text-sm">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
             </a>
         </div>
     </div>

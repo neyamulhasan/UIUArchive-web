@@ -7,7 +7,8 @@
 // Site Configuration
 define('SITE_NAME', 'UIUArchive');
 define('SITE_MOTTO', 'Built by UIU Minds');
-define('SITE_URL', 'http://localhost/MadeInUIU-web');
+define('SITE_URL', 'http://localhost/UIUArchive-web');
+define('BASE_URL', 'http://localhost/UIUArchive-web'); // Base URL for links and resources
 define('SITE_EMAIL', 'info@uiuarchive.com');
 
 // Path Configuration
@@ -23,7 +24,6 @@ define('ALLOWED_DOCUMENT_TYPES', ['pdf', 'doc', 'docx', 'ppt', 'pptx']);
 
 // Pagination
 define('PROJECTS_PER_PAGE', 12);
-define('COMMENTS_PER_PAGE', 20);
 define('NOTIFICATIONS_PER_PAGE', 15);
 
 // Session Configuration
@@ -37,16 +37,6 @@ date_default_timezone_set('Asia/Dhaka');
 // Error Reporting (disable in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-// Badge IDs (from database)
-define('BADGE_FIRST_PROJECT', 1);
-define('BADGE_RISING_STAR', 2);
-define('BADGE_POPULAR_CREATOR', 3);
-define('BADGE_PROLIFIC', 4);
-define('BADGE_COMMUNITY_CHAMPION', 5);
-define('BADGE_FACULTY_FAVORITE', 6);
-define('BADGE_TRENDING_MASTER', 7);
-define('BADGE_EARLY_ADOPTER', 8);
 
 // Categories
 $categories = [

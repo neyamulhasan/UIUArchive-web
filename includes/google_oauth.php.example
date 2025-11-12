@@ -12,7 +12,7 @@
 // Google OAuth Settings
 define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID_HERE');
 define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET_HERE');
-define('GOOGLE_REDIRECT_URI', 'http://localhost/MadeInUIU-web/pages/google_callback.php');
+define('GOOGLE_REDIRECT_URI', 'http://localhost/UIUArchive-web/pages/google_callback.php');
 
 // OAuth Scopes - what information we request
 define('GOOGLE_SCOPES', 'email profile');

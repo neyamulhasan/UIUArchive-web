@@ -11,7 +11,7 @@ define('DB_PASS', '');
 define('DB_NAME', 'uiuarchive');
 
 // Base URL Configuration
-define('BASE_URL', '/MadeInUIU-web');
+define('BASE_URL', '/UIUArchive-web');
 
 // Create connection
 $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
@@ -23,6 +23,10 @@ if (!$conn) {
 
 // Set charset to utf8mb4 for emoji and special character support
 mysqli_set_charset($conn, "utf8mb4");
+
+// Set timezone to Asia/Dhaka (Bangladesh)
+mysqli_query($conn, "SET time_zone = '+06:00'");
+date_default_timezone_set('Asia/Dhaka');
 
 // Function to close database connection
 function closeConnection() {
